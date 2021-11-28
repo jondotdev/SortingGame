@@ -16,11 +16,9 @@ public class InputHandler : MonoBehaviour
 	[Header("Movement Settings")]
 	public bool analogMovement;
 
-#if !UNITY_IOS || !UNITY_ANDROID
-	[Header("Mouse Cursor Settings")]
-	public bool cursorLocked = true;
-	public bool cursorInputForLook = true;
-#endif
+	private void Start() {
+		gm = transform.GetComponent<GameManager>();
+	}
 
 	public void OnMove(InputValue value)
 	{
@@ -36,7 +34,7 @@ public class InputHandler : MonoBehaviour
 
 	public void OnLook(InputValue value)
 	{
-		if (!gm.paused && cursorInputForLook)
+		if (!gm.paused)
 		{
 			LookInput(value.Get<Vector2>());
 		}

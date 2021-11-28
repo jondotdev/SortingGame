@@ -1,12 +1,15 @@
+using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-public class Player : MonoBehaviour
+public class Player : NetworkBehaviour
 {
+    #region VARIABLES
     public GameManager gm;
 
-    [Header("Player")] 
+    [Header("Player")]
     public float MoveSpeed = 6f;
     public float SprintSpeed = 10f;
     public float RotationSpeed = 0.2f;
@@ -21,7 +24,7 @@ public class Player : MonoBehaviour
     public float throwForce = 10f;
     public float carryMoveSpeed = 3f;
     public float carrySprintSpeed = 5f;
-    
+
     [Header("Pushing Rigidbodies")]
     public LayerMask pushLayers;
     public bool canPush = true;
@@ -71,19 +74,28 @@ public class Player : MonoBehaviour
     private CharacterController cc;
 
     private Interactable heldObject = null;
-
-    private void Awake()
-    {
-        if (_mainCamera == null)
-        {
-            _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
-        }
-    }
+    #endregion VARIABLES
 
     private void Start()
     {
+        if(isLocalPlayer) {
+
+        Transform spawn = GameObject.FindWithTag("SpawnLocation").transform;
+        transform.position = spawn.position;
+        transform.rotation = spawn.rotation;
+
+        gm = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
+
+        gm.Unpause();
+
+        if (_mainCamera == null) {
+            _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+        }
+
+        GameObject.FindWithTag("PlayerFollowCamera").GetComponent<Cinemachine.CinemachineVirtualCamera>().Follow = transform.Find("PlayerCameraRoot");
+
         _controller = GetComponent<CharacterController>();
-        _input = GetComponent<InputHandler>();
+        _input = gm.transform.GetComponent<InputHandler>();
 
         // reset our timeouts on start
         _jumpTimeoutDelta = JumpTimeout;
@@ -95,25 +107,26 @@ public class Player : MonoBehaviour
 
         currentMoveSpeed = MoveSpeed;
         currentSprintSpeed = SprintSpeed;
+        }
     }
 
     private void Update()
     {
-        if(transform.position.y < -10)
-        {
-            Kill();
-        }
+        if(isLocalPlayer) { 
 
         HandleInteractions();
 
         JumpAndGravity();
         GroundedCheck();
         Move();
+        }
     }
 
     private void LateUpdate()
     {
-        CameraRotation();
+        if(isLocalPlayer) {
+            CameraRotation();
+        }
     }
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
@@ -331,10 +344,5 @@ public class Player : MonoBehaviour
 
         // when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
         Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z), GroundedRadius);
-    }
-
-    public void Kill()
-    {
-        gm.KillPlayer(gameObject);
     }
 }

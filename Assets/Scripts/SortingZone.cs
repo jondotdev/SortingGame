@@ -31,7 +31,7 @@ public class SortingZone : MonoBehaviour
         }
         else if (killsPlayer && other.transform.tag == "Player")
         {
-            other.transform.GetComponent<Player>().Kill();
+            //other.transform.GetComponent<Player>().Kill();
         }
     }
 

@@ -7,14 +7,11 @@ public class GameManager : MonoBehaviour
 {
     public GameObject pausePanel;
     public Transform interactionCursor;
+
     public Text Score;
-    public Cinemachine.CinemachineVirtualCamera PlayerFollowCamera;
-    public GameObject playerPrefab;
-    public SpawnLocation spawnLocation = null;
+    public int score = 0;
 
     public bool paused = false;
-
-    public int score = 0;
 
     private Image cursor;
     private Text cursorHint;
@@ -23,18 +20,9 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        if(spawnLocation == null)
-        {
-            SpawnPlayer(Vector3.zero, Quaternion.identity);
-        }
-        else
-        {
-            SpawnPlayer(spawnLocation);
-        }
         cursor = interactionCursor.GetComponent<Image>();
         cursorHint = interactionCursor.Find("CursorHint").GetComponent<Text>();
         sm = transform.GetComponent<SoundManager>();
-        Unpause();
     }
 
     private void Update()
@@ -76,43 +64,12 @@ public class GameManager : MonoBehaviour
         paused = true;
     }
 
-    public void SpawnPlayer(Vector3 position, Quaternion rotation)
-    {
-        GameObject go;
-        go = Instantiate(playerPrefab, position, rotation);
-        Player p = go.transform.GetComponent<Player>();
-        InputHandler h = go.transform.GetComponent<InputHandler>();
-        p.gm = this;
-        h.gm = this;
-        PlayerFollowCamera.Follow = go.transform.Find("PlayerCameraRoot");
-    }
-
-    public void SpawnPlayer(SpawnLocation s)
-    {
-        SpawnPlayer(s.transform.position, s.transform.rotation);
-    }
-
-    public void KillPlayer(GameObject player)
-    {
-        Destroy(player);
-        if (spawnLocation == null)
-        {
-            SpawnPlayer(Vector3.zero, Quaternion.identity);
-        }
-        else
-        {
-            SpawnPlayer(spawnLocation);
-        }
-    }
-
-    public void ShowInteractionCursor(string hintText)
-    {
+    public void ShowInteractionCursor(string hintText) {
         cursor.color = new Color(.75f, .75f, .75f, .75f);
         cursorHint.text = hintText;
     }
 
-    public void HideInteractionCursor()
-    {
+    public void HideInteractionCursor() {
         cursor.color = new Color(.75f, .75f, .75f, .25f);
         cursorHint.text = "";
     }
