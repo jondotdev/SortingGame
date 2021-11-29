@@ -76,37 +76,37 @@ public class Player : NetworkBehaviour
     private Interactable heldObject = null;
     #endregion VARIABLES
 
-    private void Start()
-    {
+    private void Start() {
         if(isLocalPlayer) {
+            gm = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
 
-        Transform spawn = GameObject.FindWithTag("SpawnLocation").transform;
-        transform.position = spawn.position;
-        transform.rotation = spawn.rotation;
+            gm.Unpause();
 
-        gm = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
+            if (_mainCamera == null) {
+                _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+            }
 
-        gm.Unpause();
+            GameObject.FindWithTag("PlayerFollowCamera").GetComponent<Cinemachine.CinemachineVirtualCamera>().Follow = transform.Find("PlayerCameraRoot");
 
-        if (_mainCamera == null) {
-            _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
-        }
+            _controller = GetComponent<CharacterController>();
+            _input = gm.transform.GetComponent<InputHandler>();
 
-        GameObject.FindWithTag("PlayerFollowCamera").GetComponent<Cinemachine.CinemachineVirtualCamera>().Follow = transform.Find("PlayerCameraRoot");
+            // reset our timeouts on start
+            _jumpTimeoutDelta = JumpTimeout;
+            _fallTimeoutDelta = FallTimeout;
 
-        _controller = GetComponent<CharacterController>();
-        _input = gm.transform.GetComponent<InputHandler>();
+            Head = transform.Find("PlayerCameraRoot");
+            Hand = transform.Find("Hand");
+            cc = transform.GetComponent<CharacterController>();
 
-        // reset our timeouts on start
-        _jumpTimeoutDelta = JumpTimeout;
-        _fallTimeoutDelta = FallTimeout;
+            currentMoveSpeed = MoveSpeed;
+            currentSprintSpeed = SprintSpeed;
 
-        Head = transform.Find("PlayerCameraRoot");
-        Hand = transform.Find("Hand");
-        cc = transform.GetComponent<CharacterController>();
-
-        currentMoveSpeed = MoveSpeed;
-        currentSprintSpeed = SprintSpeed;
+            cc.enabled = false;
+            Transform spawn = GameObject.FindWithTag("SpawnLocation").transform;
+            transform.position = spawn.position;
+            transform.rotation = spawn.rotation;
+            cc.enabled = true;
         }
     }
 
@@ -114,11 +114,11 @@ public class Player : NetworkBehaviour
     {
         if(isLocalPlayer) { 
 
-        HandleInteractions();
+            HandleInteractions();
 
-        JumpAndGravity();
-        GroundedCheck();
-        Move();
+            JumpAndGravity();
+            GroundedCheck();
+            Move();
         }
     }
 

@@ -11,22 +11,24 @@ public class BoxSpawning : NetworkBehaviour
     public GameObject[] boxPrefabs;
 
     private void Start() {
-        if(spawnAtStart) { SpawnBox(); }
+        if(isServer && spawnAtStart) { SpawnBox(); }
     }
 
     private float i = 0;
     private void Update() {
-        i += Time.deltaTime;
+        if(isServer) {
+            i += Time.deltaTime;
 
-        if(i >= spawnDelay)
-        {
-            i = 0;
-            SpawnBox();
+            if(i >= spawnDelay) {
+                i = 0;
+                SpawnBox();
+            }
         }
     }
 
     private void SpawnBox() {
         int r = Random.Range(0, boxPrefabs.Length);
-        Instantiate(boxPrefabs[r], spawnBoxesAt, Quaternion.identity);
+        GameObject go = Instantiate(boxPrefabs[r], spawnBoxesAt, Quaternion.identity);
+        NetworkServer.Spawn(go);
     }
 }

@@ -171,7 +171,7 @@ MonoBehaviour:
   syncRotation: 1
   syncScale: 1
   interpolatePosition: 1
-  interpolateRotation: 0
+  interpolateRotation: 1
   interpolateScale: 0
   bufferTimeMultiplier: 1
   bufferSizeLimit: 64
